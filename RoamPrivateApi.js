@@ -49,21 +49,22 @@ class RoamPrivateApi {
 	 * Create a block as a child of block.
 	 * @param {string} text 
 	 * @param {uid} uid - parent UID where block has to be inserted.
+   * @param {integer} order - order of block; 0 (default) at top, -1 at bottom
 	 */
-	async createBlock( text, uid ) {
-		const result = await this.page.evaluate( ( text, uid ) => {
+	async createBlock( text, uid , order = 0 ) {
+		const result = await this.page.evaluate( ( text, uid, order ) => {
 			if ( ! window.roamAlphaAPI ) {
 				return Promise.reject( 'No Roam API detected' );
 			}
 			const result = window.roamAlphaAPI.createBlock(
 				{"location": 
 					{"parent-uid": uid, 
-					 "order": 0}, 
+					 "order": order}, 
 				 "block": 
 					{"string": text}})
 			console.log( result );
 			return Promise.resolve( result );
-		}, text, uid );
+		}, text, uid, order );
 		// Let's give time to sync.
 		await this.page.waitForTimeout( 1000 );
 		return result;
